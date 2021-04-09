@@ -1,0 +1,20 @@
+.main-card-title {
+    border-bottom: 1px solid rgba(0, 0, 0, .05)
+}
+
+.main-card-title>.page-title {
+    font-size: 24px;
+}
+
+.main-card-title>.page-action {
+    text-align: right;
+}
+
+.v-navigation-drawer__border {
+    margin-top: 64px;
+}
+
+header.v-toolbar {
+    color: #EAF2F7 !important;
+    background-color: #7A9384 !important;
+}
