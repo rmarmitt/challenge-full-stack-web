@@ -2,6 +2,7 @@
   "name": "edtech_backend",
   "version": "1.0.0",
   "description": "Backend for EdTech project",
+  "private": true,
   "scripts": {
     "dev": "ts-node-dev --transpile-only --ignore-watch node_modules src/server.ts",
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -10,12 +11,12 @@
   "author": "Rafael Marmitt",
   "license": "ISC",
   "dependencies": {
+    "class-validator": "^0.13.1",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "pg": "^8.5.1",
-    "typeorm": "^0.2.32",
-    "yup": "^0.32.9"
+    "typeorm": "^0.2.32"
   },
   "devDependencies": {
     "@types/cors": "^2.8.10",

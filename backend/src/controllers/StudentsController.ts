@@ -1,85 +1,123 @@
-import { Request, Response } from "express";
-import { getRepository, Like, QueryBuilder, SelectQueryBuilder } from 'typeorm';
-import * as Yup from 'yup';
-import { CpfValidator } from "../validators/CpfValidator";
+import { Request, Response, NextFunction } from "express";
+import {
+  getRepository,
+  SelectQueryBuilder,
+  EntityNotFoundError,
+} from "typeorm";
+import { validate } from "class-validator";
 import Student from "../entity/Student";
+import { ValidationException } from "../exceptions/ValidationException";
 
 export default {
-  async list(req: Request, res: Response) {
-    const studentRepository = getRepository(Student);
-
-    let query: SelectQueryBuilder<Student> = studentRepository.createQueryBuilder();
-
-    console.log(req.query.q)
-
-    if(req.query.q) {
-        const expression : string = req.query.q.toString();
-        console.log(expression);
-        query = query.where([
-            { name: Like(`%${req.query.q}%`)},
-            { email: Like(`%${req.query.q}%`)},
-            { cpf: Like(`%${expression.replace(/\D/g, '')}%`)},
-            { academic_registry: Like(`%${req.query.q}%`)}
-        ]);
-    }
-
-    const students = await query.getMany();
-
-    return res.json(students);
-    //return res.json(orphanageView.renderMany(orphanages));
-  },
-
-  async create(req: Request, res: Response) {
+  async list(req: Request, res: Response, next: NextFunction) {
     try {
-        const studentRepository = getRepository(Student);
+      const studentRepository = getRepository(Student);
 
-        const data = {
-            name: req.body.name,
-            email: req.body.email,
-            academic_registry: req.body.academic_registry,
-            cpf: req.body.cpf
+      let query: SelectQueryBuilder<Student> = studentRepository.createQueryBuilder();
+
+      if (req.query.name) {
+        query = query.andWhere("UPPER(name) LIKE :name", {
+          name: `%${req.query.name.toString().toUpperCase()}%`,
+        });
+      }
+
+      if (req.query.email) {
+        query = query.andWhere(`UPPER(email) LIKE :email`, {
+          email: `%${req.query.email.toString().toUpperCase()}%`,
+        });
+      }
+
+      if (req.query.cpf) {
+        query = query.andWhere(`cpf = :cpf`, { cpf: req.query.cpf });
+      }
+
+      const itemsPerPage: number = parseInt(`${req.query.itemsPerPage}`);
+      const currentPage: number = parseInt(`${req.query.currentPage}`);
+      const itemsToSkip = itemsPerPage * (currentPage - 1);
+
+      query.take(itemsPerPage);
+      query.skip(itemsToSkip);
+
+      if (req.query.sortBy) {
+        if (req.query.sortDesc === "true") {
+          query = query.orderBy(`"${req.query.sortBy}"`, "DESC");
+        } else {
+          query = query.orderBy(`"${req.query.sortBy}"`, "ASC");
         }
+      }
 
-        //debug
-        console.log(CpfValidator.validate(req.body.cpf));
+      const students = await query.getMany();
+      const totalStudents = await studentRepository.count();
+      const totalNumOfPages = totalStudents / itemsPerPage;
 
-        Yup.addMethod(Yup.string, "cpf", function(errorMessage) {
-            return this.test('test-cpf', errorMessage, function(value) {
-                const { path, createError } = this;
-
-                if(CpfValidator.validate(value)) {
-                    return true;
-                }
-
-                createError({path, message: errorMessage})
-            });
-        });
-
-        const schema = Yup.object().shape({
-            name: Yup.string().trim().required('O campo "Nome" é obrigatório.'),
-            email: Yup.string().trim().required('O campo "E-mail" é obrigatório.').email('O e-mail informado é inválido!'),
-            academic_registry: Yup.string().trim().required('O campo "Registro acadêmico" é obrigatório.'),
-            //cpf: Yup.string().required().cpf()
-        });
-
-        await schema.validate(data, {
-            abortEarly: false
-        });
-
-        const student = studentRepository.create(data);
-
-        const entity = await studentRepository.save(student)
-           
-        return res.status(201).json({message: 'Registro criado com sucesso!', student: entity});
-    } catch (exception) {
-        if (exception instanceof Yup.ValidationError) {
-            return res.status(422).json({errors: exception.errors});
-        }
-
-        console.error(exception);
-        return res.status(500).json({message: 'Ocorreram erros ao processas sua solicitação.', errors: [ exception.message ]});
-    } 
+      return res.json({ students, totalStudents, totalNumOfPages });
+    } catch (err) {
+      next(err);
+    }
   },
 
-  async update() {},
+  async get(req: Request, res: Response, next: NextFunction) {
+    try {
+      const studentRepository = getRepository(Student);
+
+      const student = await studentRepository.findOneOrFail(req.params.id);
+
+      return res.json(student);
+    } catch (err) {
+      if (err instanceof EntityNotFoundError) {
+        return res.status(302).json();
+      }
+      next(err);
+    }
+  },
+
+  async create(req: Request, res: Response, next: NextFunction) {
+    try {
+      const studentRepository = getRepository(Student);
+
+      const data = {
+        name: req.body.name,
+        email: req.body.email,
+        academic_registry: req.body.academic_registry,
+        cpf: req.body.cpf,
+      };
+
+      const student = studentRepository.create(data);
+
+      const errors = await validate(student, { stopAtFirstError: false });
+
+      if (errors.length) {
+        throw new ValidationException(errors);
+      }
+
+      const entity = await studentRepository.save(student);
+
+      return res.status(201).json({ student: entity });
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  async update(req: Request, res: Response, next: NextFunction) {
+    try {
+      const studentRepository = getRepository(Student);
+
+      const student = await studentRepository.findOneOrFail(req.body.id);
+
+      student.setName(req.body.name);
+      student.setEmail(req.body.email);
+
+      const errors = await validate(student, { stopAtFirstError: false });
+
+      if (errors.length) {
+        throw new ValidationException(errors);
+      }
+
+      await studentRepository.save(student);
+
+      return res.json();
+    } catch (err) {
+      next(err);
+    }
+  },
 };
