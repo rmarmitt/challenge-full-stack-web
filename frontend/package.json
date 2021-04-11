@@ -12,9 +12,11 @@
   "dependencies": {
     "axios": "^0.21.1",
     "core-js": "^3.6.5",
+    "v-mask": "^2.2.4",
     "vue": "^2.6.11",
     "vue-lottie": "^0.2.1",
     "vue-router": "^3.5.1",
+    "vue-simple-alert": "^1.1.1",
     "vuelidate": "^0.7.6",
     "vuetify": "^2.4.0"
   },

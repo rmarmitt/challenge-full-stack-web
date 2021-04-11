@@ -1,0 +1,161 @@
+openapi: "3.0.2"
+info:
+  title: EdTech
+  version: "1.0"
+servers:
+  - url: https://localhost:5000/api/v1
+paths:
+  /students:
+    get:
+      summary: Get all students
+      parameters:
+        - in: query
+          name: name
+          schema:
+            type: string
+        - in: query
+          name: email
+          schema:
+            type: string
+        - in: query
+          name: cpf
+          schema:
+            type: string
+        - in: query
+          name: itemsPerPage
+          required: true
+          schema:
+            type: integer
+        - in: query
+          name: currentPage
+          required: true
+          schema:
+            type: integer
+        - in: query
+          name: sortBy
+          schema:
+            type: string
+        - in: query
+          name: sortDesc
+          schema:
+            type: boolean
+      responses:
+        "200":
+          description: List of students
+          content:
+            application/json:
+              example:
+                [
+                  {
+                    id: number,
+                    name: string,
+                    email: string,
+                    cpf: string,
+                    academic_registry: string,
+                  },
+                ]
+        "5XX":
+          description: Internal server error
+          content:
+            application/json:
+              example: { message: "Internal server error", errors: [string] }
+    post:
+      summary: Creates a new student
+      requestBody:
+        required: true
+        content:
+          application/json:
+            example:
+              {
+                name: string,
+                email: string,
+                cpf: string,
+                academic_registry: string,
+              }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              example:
+                {
+                  id: number,
+                  name: string,
+                  email: string,
+                  cpf: string,
+                  academic_registry: string,
+                }
+        "422":
+          description: Validation error
+          content:
+            application/json:
+              example: { message: "Validation error", errors: [string] }
+
+        "5XX":
+          description: Internal server error
+          content:
+            application/json:
+              example: { message: "Internal server error", errors: [string] }
+    patch:
+      summary: Partial update of student
+      requestBody:
+        required: true
+        content:
+          application/json:
+            example: { id: integer, name: string, email: string }
+      responses:
+        "200":
+          description: OK
+        "302":
+          description: Entity not found
+          content:
+            application/json:
+              example: { message: "Entity not found", errors: [string] }
+        "5XX":
+          description: Internal server error
+          content:
+            application/json:
+              example: { message: "Internal server error", errors: [string] }
+  /students/{id}:
+    get:
+      summary: Get stundent by ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: OK
+        "302":
+          description: Entity not found
+          content:
+            application/json:
+              example: { message: "Entity not found", errors: [string] }
+        "5XX":
+          description: Internal server error
+          content:
+            application/json:
+              example: { message: "Internal server error", errors: [string] }
+    delete:
+      summary: Delete student by ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: No Content
+        "302":
+          description: Entity not found
+          content:
+            application/json:
+              example: { message: "Entity not found", errors: [string] }
+        "5XX":
+          description: Internal server error
+          content:
+            application/json:
+              example: { message: "Internal server error", errors: [string] }

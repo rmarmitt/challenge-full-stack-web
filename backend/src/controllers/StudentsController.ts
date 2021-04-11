@@ -1,9 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import {
-  getRepository,
-  SelectQueryBuilder,
-  EntityNotFoundError,
-} from "typeorm";
+import { getRepository, SelectQueryBuilder } from "typeorm";
 import { validate } from "class-validator";
 import Student from "../entity/Student";
 import { ValidationException } from "../exceptions/ValidationException";
@@ -64,9 +60,6 @@ export default {
 
       return res.json(student);
     } catch (err) {
-      if (err instanceof EntityNotFoundError) {
-        return res.status(302).json();
-      }
       next(err);
     }
   },
@@ -115,7 +108,20 @@ export default {
 
       await studentRepository.save(student);
 
-      return res.json();
+      return res.send();
+    } catch (err) {
+      next(err);
+    }
+  },
+  async delete(req: Request, res: Response, next: NextFunction) {
+    try {
+      const studentRepository = getRepository(Student);
+
+      const student = await studentRepository.findOneOrFail(`${req.params.id}`);
+
+      studentRepository.delete(student);
+
+      return res.status(204).send();
     } catch (err) {
       next(err);
     }

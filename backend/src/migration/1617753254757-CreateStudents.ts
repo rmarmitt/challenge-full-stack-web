@@ -18,18 +18,20 @@ export class CreateStudents1617753254757 implements MigrationInterface {
             name: "name",
             type: "varchar",
             length: "80",
-            isNullable: false
+            isNullable: false,
           },
           {
             name: "email",
             type: "varchar",
-            isNullable: false
+            length: "120",
+            isNullable: false,
           },
           {
             name: "academic_registry",
             type: "varchar",
+            length: "80",
             isUnique: true,
-            isNullable: false
+            isNullable: false,
           },
           {
             name: "cpf",

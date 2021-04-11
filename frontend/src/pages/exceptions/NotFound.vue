@@ -22,7 +22,7 @@ export default {
   }),
   methods: {
     handleGoBackClick() {
-      this.$router.push("/");
+      this.$router.go(-1);
     },
   },
 };

@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction, ErrorRequestHandler } from "express";
+import { EntityNotFoundError } from "typeorm";
 import { ValidationException } from "./ValidationException";
 
 const errorHandler: ErrorRequestHandler = (
@@ -18,6 +19,15 @@ const errorHandler: ErrorRequestHandler = (
     return res
       .status(422)
       .json({ message: "Validation error", errors: errors });
+  }
+
+  if (error instanceof EntityNotFoundError) {
+    return res
+      .status(302)
+      .json({
+        message: "Entity not found",
+        errors: ["Não foi possível localizar o registro solicitado."],
+      });
   }
 
   console.error(error);

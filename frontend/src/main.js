@@ -2,13 +2,20 @@ import Vue from "vue";
 import App from "./App.vue";
 import vuetify from "./plugins/vuetify";
 import VueRouter from "vue-router";
-import NotFound from "./components/exceptions/NotFound";
-import HelloWorld from "./components/HelloWorld";
-import StudentList from "./components/students/StudentList";
-import StudentAdd from "./components/students/StudentAdd";
+import VueSimpleAlert from "vue-simple-alert";
+import { VueMaskDirective } from "v-mask";
+
+//Pages
+import NotFound from "./pages/exceptions/NotFound";
+import Landing from "./pages/Landing";
+import StudentList from "./pages/students/StudentList";
+import StudentAdd from "./pages/students/StudentAdd";
+import StudentEdit from "./pages/students/StudentEdit";
 
 Vue.config.productionTip = false;
 Vue.use(VueRouter);
+Vue.use(VueSimpleAlert);
+Vue.directive("mask", VueMaskDirective);
 
 const routes = [
   {
@@ -18,7 +25,7 @@ const routes = [
   },
   {
     path: "/",
-    component: HelloWorld,
+    component: Landing,
     meta: { title: "Página inicial - EdTech" },
   },
   {
@@ -30,6 +37,12 @@ const routes = [
     path: "/students/add",
     component: StudentAdd,
     meta: { title: "Novo estudante - EdTech" },
+  },
+  {
+    path: "/students/edit/:id",
+    props: true,
+    component: StudentEdit,
+    meta: { title: "Editar estudante - EdTech" },
   },
 ];
 
