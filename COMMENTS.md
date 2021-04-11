@@ -33,3 +33,6 @@ Back End:
 
 ## Quais requisitos obrigatórios que não foram entregues
 * N/A
+
+## Documentação da arquitetura
+* Está localizada em /backend/swagger.yml
