@@ -109,15 +109,20 @@ export default {
       };
       this.loading = true;
 
-      api.patch("students", data).then(() => {
-        this.loading = false;
+      api
+        .patch("students", data)
+        .then(() => {
+          this.loading = false;
 
-        this.$fire({
-          title: "Sucesso!",
-          text: "Cadastro atualizado com sucesso!",
-          type: "success",
+          this.$fire({
+            title: "Sucesso!",
+            text: "Cadastro atualizado com sucesso!",
+            type: "success",
+          });
+        })
+        .catch(() => {
+          this.loading = false;
         });
-      });
     },
   },
   computed: {
@@ -152,7 +157,6 @@ export default {
     api
       .get(`students/${this.$route.params.id}`)
       .then((res) => {
-        console.log(res);
         this.form.id = res.data.id;
         this.form.name = res.data.name;
         this.form.email = res.data.email;

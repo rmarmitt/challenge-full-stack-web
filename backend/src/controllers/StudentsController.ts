@@ -43,8 +43,8 @@ export default {
       }
 
       const students = await query.getMany();
-      const totalStudents = await studentRepository.count();
-      const totalNumOfPages = totalStudents / itemsPerPage;
+      const totalStudents = await query.getCount();
+      const totalNumOfPages = Math.ceil(totalStudents / itemsPerPage);
 
       return res.json({ students, totalStudents, totalNumOfPages });
     } catch (err) {

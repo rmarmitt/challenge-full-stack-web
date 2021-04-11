@@ -159,9 +159,14 @@ export default {
         confirmButtonText: "Confirmar",
       }).then((result) => {
         if (result.value) {
-          api.delete(`students/${student.id}`).then(() => {
-            this.doSearch();
-          });
+          api
+            .delete(`students/${student.id}`)
+            .then(() => {
+              this.doSearch();
+            })
+            .catch(() => {
+              this.loading = false;
+            });
         }
       });
     },
@@ -174,11 +179,12 @@ export default {
       this.loading = true;
 
       const { page, itemsPerPage, sortBy, sortDesc } = this.tableOptions;
+      const currentPage = page;
       const qParams = {
         name: this.name,
         email: this.email,
         cpf: this.cpf,
-        currentPage: page,
+        currentPage,
         itemsPerPage: itemsPerPage,
         sortBy: sortBy[0],
         sortDesc: sortDesc[0],
@@ -190,16 +196,25 @@ export default {
         .map((k) => esc(k) + "=" + esc(qParams[k]))
         .join("&");
 
-      api.get(`students?${query}`).then((res) => {
-        this.students = res.data.students;
-        this.totalStudents = res.data.totalStudents;
-        this.totalNumOfPages = res.data.totalNumOfPages;
-        this.loading = false;
-      });
+      api
+        .get(`students?${query}`)
+        .then((res) => {
+          this.students = res.data.students;
+          this.totalStudents = res.data.totalStudents;
+          this.totalNumOfPages = res.data.totalNumOfPages;
+
+          const availablePages = Math.ceil(
+            this.totalStudents / itemsPerPage
+          );
+          if (currentPage > availablePages) {
+            this.tableOptions.page = availablePages;
+          }
+          this.loading = false;
+        })
+        .catch(() => {
+          this.loading = false;
+        });
     },
-  },
-  mounted() {
-    this.doSearch();
   },
 };
 </script>

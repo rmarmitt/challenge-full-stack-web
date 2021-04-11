@@ -123,16 +123,21 @@ export default {
       };
       this.loading = true;
 
-      api.post("students", data).then((res) => {
-        this.loading = false;
-        this.$fire({
-          title: "Sucesso!",
-          text: "Estudante cadastrado com sucesso!",
-          type: "success",
-        }).then(() => {
-          this.$router.push(`students/edit/${res.response.data.id}`);
+      api
+        .post("students", data)
+        .then((res) => {
+          this.loading = false;
+          this.$fire({
+            title: "Sucesso!",
+            text: "Estudante cadastrado com sucesso!",
+            type: "success",
+          }).then(() => {
+            this.$router.push(`/students/edit/${res.data.id}`);
+          });
+        })
+        .catch(() => {
+          this.loading = false;
         });
-      });
     },
   },
   computed: {
