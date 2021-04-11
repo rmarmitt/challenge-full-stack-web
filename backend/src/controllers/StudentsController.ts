@@ -85,7 +85,7 @@ export default {
 
       const entity = await studentRepository.save(student);
 
-      return res.status(201).json({ student: entity });
+      return res.status(201).json(entity);
     } catch (err) {
       next(err);
     }
