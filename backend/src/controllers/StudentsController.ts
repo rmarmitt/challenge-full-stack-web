@@ -108,7 +108,7 @@ export default {
 
       await studentRepository.save(student);
 
-      return res.send();
+      return res.status(204).send();
     } catch (err) {
       next(err);
     }
@@ -119,7 +119,7 @@ export default {
 
       const student = await studentRepository.findOneOrFail(`${req.params.id}`);
 
-      studentRepository.delete(student);
+      await studentRepository.delete(student);
 
       return res.status(204).send();
     } catch (err) {

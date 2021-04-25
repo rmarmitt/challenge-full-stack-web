@@ -70,7 +70,7 @@ export default class Student {
     return this.cpf;
   }
 
-  public setCpf(cpf: string) {
+  public setCpf(cpf: string): void {
     this.cpf = cpf;
   }
 }

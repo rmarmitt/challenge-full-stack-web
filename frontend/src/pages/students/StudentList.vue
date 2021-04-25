@@ -185,7 +185,7 @@ export default {
         email: this.email,
         cpf: this.cpf,
         currentPage,
-        itemsPerPage: itemsPerPage,
+        itemsPerPage,
         sortBy: sortBy[0],
         sortDesc: sortDesc[0],
       };
